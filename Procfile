@@ -1,1 +1,1 @@
-web: ./bin/gotemplate
+worker: ./bin/copymediagroup
