@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -11,11 +12,44 @@ import (
 	"github.com/PaulSonOfLars/gotgbot/v2/ext/handlers"
 )
 
+var MediaGroups = make(map[string][]Mdata)
+
+type Pics struct {
+	Media   []gotgbot.PhotoSize
+	Caption string
+	ParseM  string
+}
+
+type Mdata struct {
+	photo Pics
+	video Video
+	aud   Audio
+	doc   Docs
+}
+
+type Video struct {
+	Media   *gotgbot.Video
+	Caption string
+	ParseM  string
+}
+
+type Docs struct {
+	Media   *gotgbot.Document
+	Caption string
+	ParseM  string
+}
+
+type Audio struct {
+	Media   *gotgbot.Audio
+	Caption string
+	ParseM  string
+}
+
 func main() {
 	// Get token from the environment variable
 	token := os.Getenv("TOKEN")
 	if token == "" {
-        panic("No token")
+		panic("No token")
 	}
 
 	// Create bot from environment value.
@@ -76,9 +110,32 @@ func main() {
 
 func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 	msg := ctx.EffectiveMessage
-	_, err := msg.Copy(b, msg.Chat.Id, &gotgbot.CopyMessageOpts{Caption: ""})
-	if err != nil {
+	if msg.MediaGroupId != "" {
 		return ext.EndGroups
+	}
+	_, isit := MediaGroups[msg.MediaGroupId]
+	log.Println(msg.MediaGroupId)
+	if !isit {
+		if msg.Photo != nil {
+			MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], Mdata{
+				photo: Pics{Media: msg.Photo, Caption: msg.OriginalCaptionHTML(), ParseM: "html"},
+			})
+		}
+		if msg.Document != nil {
+			MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], Mdata{
+				doc: Docs{Media: msg.Document, Caption: msg.OriginalCaptionHTML(), ParseM: "html"},
+			})
+		}
+		if msg.Video != nil {
+			MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], Mdata{
+				video: Video{Media: msg.Video, Caption: msg.OriginalCaptionHTML(), ParseM: "html"},
+			})
+		}
+		if msg.Audio != nil {
+			MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], Mdata{
+				aud: Audio{Media: msg.Audio, Caption: msg.OriginalCaptionHTML(), ParseM: "html"},
+			})
+		}
 	}
 	_, _ = msg.Delete(b, nil)
 	return ext.EndGroups
@@ -87,5 +144,10 @@ func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 func Start(b *gotgbot.Bot, ctx *ext.Context) error {
 	msg := ctx.EffectiveMessage
 	_, _ = msg.Reply(b, "I'm alive, just add me in a channel with delete and post message permission to test!", nil)
+	/* args := ctx.Args()[1:]
+	_, isit := MediaGroups[args[0]]
+	if isit {
+		_, _ = b.SendMediaGroup(b, data, nil)
+	} */
 	return ext.EndGroups
 }
