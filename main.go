@@ -110,9 +110,6 @@ func main() {
 
 func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 	msg := ctx.EffectiveMessage
-	if msg.MediaGroupId != "" {
-		return ext.EndGroups
-	}
 	_, isit := MediaGroups[msg.MediaGroupId]
 	log.Println(msg.MediaGroupId)
 	if !isit {
