@@ -1,0 +1,7 @@
+*.md
+LICENCE
+*.toml
+*.yml
+.github
+.dockerignore
+Dockerfile
