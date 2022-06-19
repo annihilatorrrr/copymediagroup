@@ -1,2 +1,2 @@
-# gotemplate
-My go telegram bot's template.
+# copymediagroup
+A bot to demonstrate how to copy a media group using gotgbot in telegram,; demo @copymediagroupbot
