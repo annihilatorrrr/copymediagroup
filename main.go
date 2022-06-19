@@ -104,7 +104,7 @@ func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 	ONHOLD[msg.Chat.Id] = structtt{
 		Id: msg.MediaGroupId,
 	}
-	time.Sleep(2 * time.Second)
+	time.Sleep(1 * time.Second)
 	log.Println("....")
 	data, isit := MediaGroups[msg.MediaGroupId]
 	if !isit {
