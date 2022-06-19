@@ -103,11 +103,12 @@ func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 		Id: msg.MediaGroupId,
 	}
 	time.Sleep(2 * time.Second)
+	log.Println("....")
 	data, isit := MediaGroups[msg.MediaGroupId]
 	if !isit {
 		return ext.EndGroups
 	}
-	_, err = b.SendMediaGroup(msg.Chat.Id, data, nil)
+	_, err := b.SendMediaGroup(msg.Chat.Id, data, nil)
 	if err != nil {
 		log.Println(err.Error())
 	}
