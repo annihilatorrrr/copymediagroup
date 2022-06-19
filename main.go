@@ -46,8 +46,8 @@ func main() {
 	dispatcher := updater.Dispatcher
 
 	// Add echo handler to reply to all text messages.
-	dispatcher.AddHandler(handlers.NewMessage(message.ChatType("private"), Dowork))
 	dispatcher.AddHandler(handlers.NewCommand("start", Start))
+	dispatcher.AddHandler(handlers.NewMessage(message.ChatType("private"), Dowork))
 
 	// Start receiving updates.
 	err = updater.StartPolling(b, &ext.PollingOpts{
@@ -107,7 +107,10 @@ func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 	if !isit {
 		return ext.EndGroups
 	}
-	_, _ = b.SendMediaGroup(msg.Chat.Id, data, nil)
+	_, err = b.SendMediaGroup(msg.Chat.Id, data, nil)
+	if err != nil {
+		log.Println(err.Error())
+	}
 	return ext.EndGroups
 }
 
