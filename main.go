@@ -34,17 +34,7 @@ func main() {
 	}
 
 	// Create updater and dispatcher.
-	updater := ext.NewUpdater(&ext.UpdaterOpts{
-		ErrorLog: nil,
-		DispatcherOpts: ext.DispatcherOpts{
-			// If an error is returned by a handler, log it and continue going.
-			Error: func(b *gotgbot.Bot, ctx *ext.Context, err error) ext.DispatcherAction {
-				fmt.Println("an error occurred while handling update:", err.Error())
-				return ext.DispatcherActionNoop
-			},
-			MaxRoutines: ext.DefaultMaxRoutines,
-		},
-	})
+	updater := ext.NewUpdater(nil)
 	dispatcher := updater.Dispatcher
 
 	// Add echo handler to reply to all text messages.
@@ -59,7 +49,7 @@ func main() {
 
 	// Start receiving updates.
 	err = updater.StartPolling(b, &ext.PollingOpts{
-		DropPendingUpdates: true,
+		DropPendingUpdates: false,
 		GetUpdatesOpts: gotgbot.GetUpdatesOpts{
 			Timeout: 9,
 			RequestOpts: &gotgbot.RequestOpts{
