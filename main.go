@@ -12,38 +12,7 @@ import (
 	"github.com/PaulSonOfLars/gotgbot/v2/ext/handlers"
 )
 
-var MediaGroups = make(map[string][]Mdata)
-
-type Pics struct {
-	Media   []gotgbot.PhotoSize
-	Caption string
-	ParseM  string
-}
-
-type Mdata struct {
-	photo Pics
-	video Video
-	aud   Audio
-	doc   Docs
-}
-
-type Video struct {
-	Media   *gotgbot.Video
-	Caption string
-	ParseM  string
-}
-
-type Docs struct {
-	Media   *gotgbot.Document
-	Caption string
-	ParseM  string
-}
-
-type Audio struct {
-	Media   *gotgbot.Audio
-	Caption string
-	ParseM  string
-}
+var MediaGroups = make(map[string][]gotgbot.InputMedia)
 
 func main() {
 	// Get token from the environment variable
@@ -117,22 +86,22 @@ func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 	log.Println(msg.MediaGroupId)
 	if !isit {
 		if msg.Photo != nil {
-			MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], Mdata{
+			MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaPhoto{
 				photo: Pics{Media: msg.Photo, Caption: msg.OriginalCaptionHTML(), ParseM: "html"},
 			})
 		}
 		if msg.Document != nil {
-			MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], Mdata{
+			MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaDocument{
 				doc: Docs{Media: msg.Document, Caption: msg.OriginalCaptionHTML(), ParseM: "html"},
 			})
 		}
 		if msg.Video != nil {
-			MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], Mdata{
+			MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaVideo{
 				video: Video{Media: msg.Video, Caption: msg.OriginalCaptionHTML(), ParseM: "html"},
 			})
 		}
 		if msg.Audio != nil {
-			MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], Mdata{
+			MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaAudio{
 				aud: Audio{Media: msg.Audio, Caption: msg.OriginalCaptionHTML(), ParseM: "html"},
 			})
 		}
@@ -144,10 +113,10 @@ func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 func Start(b *gotgbot.Bot, ctx *ext.Context) error {
 	msg := ctx.EffectiveMessage
 	_, _ = msg.Reply(b, "I'm alive, just add me in a channel with delete and post message permission to test!", nil)
-	/* args := ctx.Args()[1:]
-	_, isit := MediaGroups[args[0]]
+	args := ctx.Args()[1:]
+	data, isit := MediaGroups[args[0]]
 	if isit {
-		_, _ = b.SendMediaGroup(b, data, nil)
-	} */
+		_, _ = b.SendMediaGroup(msg.Chat.Id, data, nil)
+	}
 	return ext.EndGroups
 }
