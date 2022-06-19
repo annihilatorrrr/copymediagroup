@@ -82,17 +82,17 @@ func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 	}
 	if msg.Document != nil {
 		MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaDocument{
-			Media: msg.Document, Caption: msg.OriginalCaptionHTML(), ParseMode: "html",
+			Media: msg.Document, Caption: msg.OriginalCaptionHTML(), ParseMode: "html", CaptionEntities: msg.CaptionEntities,
 		})
 	}
 	if msg.Video != nil {
 		MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaVideo{
-			Media: msg.Video, Caption: msg.OriginalCaptionHTML(), ParseMode: "html",
+			Media: msg.Video, Caption: msg.OriginalCaptionHTML(), ParseMode: "html", CaptionEntities: msg.CaptionEntities,
 		})
 	}
 	if msg.Audio != nil {
 		MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaAudio{
-			Media: msg.Audio, Caption: msg.OriginalCaptionHTML(), ParseMode: "html",
+			Media: msg.Audio, Caption: msg.OriginalCaptionHTML(), ParseMode: "html", CaptionEntities: msg.CaptionEntities,
 		})
 	}
 	_, _ = msg.Delete(b, nil)
