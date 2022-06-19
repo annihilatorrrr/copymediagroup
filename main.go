@@ -51,7 +51,7 @@ func main() {
 	dispatcher.AddHandler(handlers.Message{
 		AllowChannel: true,
 		Filter: func(msg *gotgbot.Message) bool {
-			return msg != nil && msg.MediaGroupId != "" && msg.Chat.Type == "channel"
+			return msg.MediaGroupId != "" && msg.Chat.Type == "channel"
 		},
 		Response: Dowork,
 	})
@@ -79,11 +79,8 @@ func main() {
 
 func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 	msg := ctx.EffectiveMessage
-	if msg.MediaGroupId != "" {
-		return ext.EndGroups
-	}
-	_, isit := MediaGroups[msg.MediaGroupId]
 	log.Println(msg.MediaGroupId)
+	_, isit := MediaGroups[msg.MediaGroupId]
 	if !isit {
 		if msg.Photo != nil {
 			MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaPhoto{
