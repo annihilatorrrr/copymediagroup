@@ -69,6 +69,8 @@ func main() {
 	_ = updater.Stop()
 }
 
+// Caption: msg.OriginalCaptionHTML(), ParseMode: "html", CaptionEntities: msg.CaptionEntities,
+
 func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 	msg := ctx.EffectiveMessage
 	if msg.MediaGroupId == "" {
@@ -77,22 +79,22 @@ func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 	log.Println(msg.MediaGroupId)
 	if msg.Photo != nil {
 		MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaPhoto{
-			Media: msg.Photo, Caption: msg.OriginalCaptionHTML(), ParseMode: "html", CaptionEntities: msg.CaptionEntities,
+			Media: msg.Photo[0],
 		})
 	}
 	if msg.Document != nil {
 		MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaDocument{
-			Media: msg.Document, Caption: msg.OriginalCaptionHTML(), ParseMode: "html", CaptionEntities: msg.CaptionEntities,
+			Media: msg.Document.FileId,
 		})
 	}
 	if msg.Video != nil {
 		MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaVideo{
-			Media: msg.Video, Caption: msg.OriginalCaptionHTML(), ParseMode: "html", CaptionEntities: msg.CaptionEntities,
+			Media: msg.Video.FileId,
 		})
 	}
 	if msg.Audio != nil {
 		MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaAudio{
-			Media: msg.Audio, Caption: msg.OriginalCaptionHTML(), ParseMode: "html", CaptionEntities: msg.CaptionEntities,
+			Media: msg.Audio.FileId,
 		})
 	}
 	_, _ = msg.Delete(b, nil)
