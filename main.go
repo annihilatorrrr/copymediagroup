@@ -77,7 +77,7 @@ func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 	log.Println(msg.MediaGroupId)
 	if msg.Photo != nil {
 		MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaPhoto{
-			Media: msg.Photo[0], Caption: msg.OriginalCaptionHTML(), ParseMode: "html", CaptionEntities: msg.CaptionEntities,
+			Media: msg.Photo[len(msg.Photo)-1].FileId, Caption: msg.OriginalCaptionHTML(), ParseMode: "html", CaptionEntities: msg.CaptionEntities,
 		})
 	}
 	if msg.Document != nil {
