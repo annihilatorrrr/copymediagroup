@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/PaulSonOfLars/gotgbot/v2/ext/handlers/filters/message"
 	"log"
 	"net/http"
 	"os"
@@ -12,7 +13,14 @@ import (
 	"github.com/PaulSonOfLars/gotgbot/v2/ext/handlers"
 )
 
-var MediaGroups = make(map[string][]gotgbot.InputMedia)
+var (
+	MediaGroups = make(map[string][]gotgbot.InputMedia)
+	ONHOLD      = make(map[int64]structtt)
+)
+
+type structtt struct {
+	Id string
+}
 
 func main() {
 	// Get token from the environment variable
@@ -38,13 +46,7 @@ func main() {
 	dispatcher := updater.Dispatcher
 
 	// Add echo handler to reply to all text messages.
-	dispatcher.AddHandler(handlers.Message{
-		AllowChannel: true,
-		Filter: func(msg *gotgbot.Message) bool {
-			return msg.MediaGroupId != ""
-		},
-		Response: Dowork,
-	})
+	dispatcher.AddHandler(handlers.NewMessage(message.ChatType("private"), Dowork))
 	dispatcher.AddHandler(handlers.NewCommand("start", Start))
 
 	// Start receiving updates.
@@ -69,6 +71,9 @@ func main() {
 
 func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 	msg := ctx.EffectiveMessage
+	if msg.MediaGroupId == "" {
+		return ext.EndGroups
+	}
 	log.Println(msg.MediaGroupId)
 	if msg.Photo != nil {
 		MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaPhoto{
@@ -91,16 +96,23 @@ func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 		})
 	}
 	_, _ = msg.Delete(b, nil)
+	if verm, isit := ONHOLD[msg.Chat.Id]; isit && msg.MediaGroupId == verm.Id {
+		return ext.EndGroups
+	}
+	ONHOLD[msg.Chat.Id] = structtt{
+		Id: msg.MediaGroupId,
+	}
+	time.Sleep(2 * time.Second)
+	data, isit := MediaGroups[msg.MediaGroupId]
+	if !isit {
+		return ext.EndGroups
+	}
+	_, _ = b.SendMediaGroup(msg.Chat.Id, data, nil)
 	return ext.EndGroups
 }
 
 func Start(b *gotgbot.Bot, ctx *ext.Context) error {
 	msg := ctx.EffectiveMessage
-	_, _ = msg.Reply(b, "I'm alive, just add me in a channel with delete and post message permission to test!", nil)
-	args := ctx.Args()[1:]
-	data, isit := MediaGroups[args[0]]
-	if isit {
-		_, _ = b.SendMediaGroup(msg.Chat.Id, data, nil)
-	}
+	_, _ = msg.Reply(b, "I'm alive, just send me a media group to test!", nil)
 	return ext.EndGroups
 }
