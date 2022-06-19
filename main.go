@@ -111,6 +111,8 @@ func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 		return ext.EndGroups
 	}
 	_, err := b.SendMediaGroup(msg.Chat.Id, data, nil)
+	MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId][:1], MediaGroups[msg.MediaGroupId][2:]...)
+	delete(ONHOLD, msg.Chat.Id)
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -119,6 +121,6 @@ func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 
 func Start(b *gotgbot.Bot, ctx *ext.Context) error {
 	msg := ctx.EffectiveMessage
-	_, _ = msg.Reply(b, "I'm alive, just send me a media group to test!", nil)
+	_, _ = msg.Reply(b, "I'm alive, just send me a media group to test!\nCode: https://github.com/annihilatorrrr/copymediagroup", nil)
 	return ext.EndGroups
 }
