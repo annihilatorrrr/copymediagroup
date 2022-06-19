@@ -51,7 +51,7 @@ func main() {
 	dispatcher.AddHandler(handlers.Message{
 		AllowChannel: true,
 		Filter: func(msg *gotgbot.Message) bool {
-			return msg.MediaGroupId != "" && msg.Chat.Type == "channel"
+			return msg.MediaGroupId != ""
 		},
 		Response: Dowork,
 	})
@@ -80,28 +80,25 @@ func main() {
 func Dowork(b *gotgbot.Bot, ctx *ext.Context) error {
 	msg := ctx.EffectiveMessage
 	log.Println(msg.MediaGroupId)
-	_, isit := MediaGroups[msg.MediaGroupId]
-	if !isit {
-		if msg.Photo != nil {
-			MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaPhoto{
-				photo: Pics{Media: msg.Photo, Caption: msg.OriginalCaptionHTML(), ParseM: "html"},
-			})
-		}
-		if msg.Document != nil {
-			MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaDocument{
-				doc: Docs{Media: msg.Document, Caption: msg.OriginalCaptionHTML(), ParseM: "html"},
-			})
-		}
-		if msg.Video != nil {
-			MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaVideo{
-				video: Video{Media: msg.Video, Caption: msg.OriginalCaptionHTML(), ParseM: "html"},
-			})
-		}
-		if msg.Audio != nil {
-			MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaAudio{
-				aud: Audio{Media: msg.Audio, Caption: msg.OriginalCaptionHTML(), ParseM: "html"},
-			})
-		}
+	if msg.Photo != nil {
+		MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaPhoto{
+			Media: msg.Photo, Caption: msg.OriginalCaptionHTML(), ParseMode: "html", CaptionEntities: msg.CaptionEntities,
+		})
+	}
+	if msg.Document != nil {
+		MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaDocument{
+			Media: msg.Document, Caption: msg.OriginalCaptionHTML(), ParseMode: "html",
+		})
+	}
+	if msg.Video != nil {
+		MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaVideo{
+			Media: msg.Video, Caption: msg.OriginalCaptionHTML(), ParseMode: "html",
+		})
+	}
+	if msg.Audio != nil {
+		MediaGroups[msg.MediaGroupId] = append(MediaGroups[msg.MediaGroupId], gotgbot.InputMediaAudio{
+			Media: msg.Audio, Caption: msg.OriginalCaptionHTML(), ParseMode: "html",
+		})
 	}
 	_, _ = msg.Delete(b, nil)
 	return ext.EndGroups
